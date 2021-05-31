@@ -1,42 +1,54 @@
+const fs = require("fs");
 const router = require("express").Router();
-
 const { notes } = require("../../db/db");
+const path = require("path");
+const db = require("../../db/db.json");
+//create random
+const { v4: uuidv4 } = require("uuid");
 
 router.get("/notes", (req, res) => {
-  let results = notes;
-  if (req.query) {
-    results = filterByQuery(req.query, results);
-  }
-  res.json(notes);
-});
+  // let results = db;
 
-// get route for getting note by id
-router.get("/notes/:id", (req, res) => {
-  const result = findById(req.params.id, notes);
-  if (result) {
-    res.json(result);
-  } else {
-    res.send(404);
-  }
+  res.json(db);
 });
 
 router.post("/notes", (req, res) => {
-  req.body.id = notes.length.toString();
+  // console.log(req);
+  let newNote = {
+    title: req.body.title,
+    text: req.body.text,
+    id: uuidv4(),
+  };
+  db.push(newNote);
+  fs.writeFile(
+    path.join(__dirname, "../../db/db.json"),
+    JSON.stringify(db, null, 2),
+    (err) => {
+      if (err) throw err;
+      res.json(newNote);
+    }
+  );
 
-  if (!validateNote(req.body)) {
-    res.status(400).send("The note is not properly formatted");
-  } else {
-    const notes = createNewNote(req.body, notes);
-    res.json(notes);
-  }
+  console.log(newNote);
 });
 
-// use req.params.id
-//if err ... send send 404
-//get  route for posting notes
-//validate?
-//create filterquery findbyid create new note
-//lib folder?
-// note fails validation send 404
+router.delete("/notes/:id", (req, res) => {
+  const idToBeDeleted = req.params.id;
+
+  for (i = 0; i < db.length; i++) {
+    if (db[i].id == idToBeDeleted) {
+      db.splice(i, 1);
+    }
+  }
+
+  fs.writeFile(
+    path.join(__dirname, "../../db/db.json"),
+    JSON.stringify(db),
+    (err) => {
+      if (err) throw err;
+      res.json("cats");
+    }
+  );
+});
 
 module.exports = router;
