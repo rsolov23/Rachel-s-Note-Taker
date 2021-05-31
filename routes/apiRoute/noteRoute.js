@@ -5,15 +5,12 @@ const path = require("path");
 const db = require("../../db/db.json");
 //create random
 const { v4: uuidv4 } = require("uuid");
-
+//GET request
 router.get("/notes", (req, res) => {
-  // let results = db;
-
   res.json(db);
 });
-
+//POST request-write to file
 router.post("/notes", (req, res) => {
-  // console.log(req);
   let newNote = {
     title: req.body.title,
     text: req.body.text,
@@ -31,7 +28,7 @@ router.post("/notes", (req, res) => {
 
   console.log(newNote);
 });
-
+//DELETE note
 router.delete("/notes/:id", (req, res) => {
   const idToBeDeleted = req.params.id;
 
@@ -50,5 +47,5 @@ router.delete("/notes/:id", (req, res) => {
     }
   );
 });
-
+//module exports
 module.exports = router;
